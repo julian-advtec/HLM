@@ -1,0 +1,243 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body,
+html {
+    height: 100%;
+    background: #ffffff;
+    color: rgb(0, 0, 0);
+    font-family: sans-serif;
+}
+
+.tv-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+/* 🟥 Superior */
+.superior {
+    height: 200px;
+    display: flex;
+}
+
+.superior>div {
+    flex: 1;
+   
+    padding: 10px;
+    text-align: center;
+}
+
+/* 🟨 Centro */
+.centro {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
+
+.columns {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    padding: 20px;
+}
+
+.column-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.column-wrapper h2 {
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+}
+
+.column {
+    width: 100%;
+    background: #222;
+    padding: 10px;
+    border-radius: 10px;
+    overflow-y: auto;
+}
+
+.mensaje-box {
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 10px;
+    background: #333;
+}
+
+#media-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  margin-bottom: 20px;
+  margin-left: 20px;
+
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+
+  max-height: 100%; /* 👈 asegura que nunca crezca más allá de su contenedor padre */
+}
+
+#media-container img,
+#media-container video {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+
+  object-fit: contain;
+  object-position: center;
+
+  border-radius: 10px;
+  display: block;
+}
+
+img,
+video {
+    max-width: 100%;
+    max-height: 90%;
+    border-radius: 10px;
+}
+
+/* 🟩 Inferior */
+.inferior {
+    height: 200px;
+    display: flex;
+}
+
+.inferior>div {
+    flex: 1;
+    border: 1px solid #444;
+    padding: 10px;
+    text-align: center;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .centro {
+        flex-direction: column;
+    }
+
+    .columns {
+        flex-direction: column;
+    }
+
+    .superior,
+    .inferior {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .superior>div,
+    .inferior>div {
+        height: 50px;
+    }
+}
+
+/* NUEVO: Contenedor de filas Paciente - Estado */
+.datos-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 15px;
+    padding: 20px;
+}
+
+/* Títulos */
+.titulos-fila {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: calc(100% / 5 - 15px);
+    /* Igual altura que .fila */
+    font-size: 2rem;
+    /* Mismo tamaño de texto */
+    font-weight: bold;
+    color: #0c348c;
+
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.titulo {
+    flex: 1;
+    text-align: center;
+}
+
+/* Cada fila Paciente | Estado */
+.fila {
+    display: flex;
+    width: 100%;
+    height: calc(100% / 5 - 15px);
+    /* Igual altura que .fila */
+    font-size: 2rem;
+    /* Aumentado */
+    border: 2px solid #0c348c;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #bdcff7;
+}
+
+/* Cada celda */
+.dato {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    /* Aumentado */
+    font-weight: bold;
+    color: #0c348c;
+    text-align: center;
+}
+
+.izquierda {
+    border-right: 2px dashed #0c348c;
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-img {
+    max-height: 100%;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.fecha-hora {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 2rem;
+    font-weight: bold;
+color: #0c348c;
+    padding: 10px;
+    text-align: center;
+    line-height: 1.4;
+
+  
+
+}

@@ -1,0 +1,40 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background: #f4f4f4;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  background: #333;
+  color: #fff;
+  margin: 0;
+  padding: 1rem;
+}
+
+.contenedor {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.columna {
+  flex: 1;
+  margin: 1rem;
+  padding: 1rem;
+  background: #fff;
+  height: 60vh;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+}
+
+.media {
+  padding: 1rem;
+}
+
+.media img,
+.media video {
+  max-width: 100%;
+  height: auto;
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Usuario</title>
+</head>
+<body>
+  <h1>Enviar mensaje a TV</h1>
+
+  <form id="formulario">
+    <select id="selector-dato" required>
+      <option value="">Seleccione una opción</option>
+    </select>
+    <input type="text" id="texto2" placeholder="Columna derecha" required>
+    <button type="submit">Enviar</button>
+  </form>
+
+  
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+  const selector = document.getElementById('selector-dato');
+  const form = document.getElementById('formulario');
+
+  // Rellena el select con las opciones
+  function actualizarSelector(datos) {
+    selector.innerHTML = '<option value="">Seleccione una opción</option>';
+    datos.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d;
+      opt.textContent = d;
+      selector.appendChild(opt);
+    });
+  }
+
+  // Carga inicial del selector desde el servidor
+  fetch('/api/datos')
+    .then(res => res.json())
+    .then(actualizarSelector);
+
+  // Recibe actualizaciones del servidor en tiempo real
+  socket.on('actualizar-datos', (datos) => {
+    actualizarSelector(datos);
+  });
+
+  // Enviar formulario
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const t1 = selector.value;
+    const t2 = document.getElementById('texto2').value;
+    if (!t1 || !t2) return;
+    socket.emit('nuevo-dato', { textos: [t1, t2] });
+    form.reset();
+    selector.selectedIndex = 0;
+  });
+</script>
+</body>
+</html>

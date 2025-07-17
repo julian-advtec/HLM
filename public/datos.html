@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Administrar Datos</title>
+  <link rel="stylesheet" href="/css/datos.css" />
+</head>
+<body>
+  <h1>Gestión de Datos</h1>
+
+  <form id="form-dato">
+    <input type="text" id="nuevo-dato" placeholder="Nuevo dato" required />
+    <button type="submit">Agregar</button>
+  </form>
+
+  <ul id="lista-datos"></ul>
+
+  <script>
+    const lista = document.getElementById('lista-datos');
+    const form = document.getElementById('form-dato');
+    const input = document.getElementById('nuevo-dato');
+
+    async function cargarDatos() {
+      const res = await fetch('/api/datos');
+      const datos = await res.json();
+      lista.innerHTML = '';
+      datos.forEach((d, i) => {
+        const li = document.createElement('li');
+        li.textContent = d;
+        const btn = document.createElement('button');
+        btn.textContent = '❌';
+        btn.onclick = async () => {
+          await fetch('/api/datos/' + i, { method: 'DELETE' });
+          cargarDatos();
+        };
+        li.appendChild(btn);
+        lista.appendChild(li);
+      });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      await fetch('/api/datos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ valor: input.value })
+      });
+      input.value = '';
+      cargarDatos();
+    });
+
+    cargarDatos();
+  </script>
+</body>
+</html>
