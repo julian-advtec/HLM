@@ -1,3 +1,4 @@
+/* RESET Y CONFIGURACIÓN GENERAL */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -12,6 +13,16 @@ html {
     font-family: sans-serif;
 }
 
+body {
+    background-image: url('/media/fondo1.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
 .tv-container {
     display: flex;
     flex-direction: column;
@@ -22,13 +33,28 @@ html {
 .superior {
     height: 200px;
     display: flex;
+    margin: 0 20px;
+    margin-top: 10px;
 }
 
 .superior>div {
     flex: 1;
-   
     padding: 10px;
     text-align: center;
+}
+
+/* Centrado y reducción de tamaño del logo */
+.logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.logo-img {
+    max-height: 50%;
+    /* Reducción a la mitad */
+    max-width: 50%;
+    object-fit: contain;
 }
 
 /* 🟨 Centro */
@@ -58,9 +84,11 @@ html {
     font-size: 1.5rem;
 }
 
+/* Contenedores transparentes en el centro */
 .column {
     width: 100%;
-    background: #222;
+    background: rgba(0, 0, 0, 0.5);
+    /* Fondo semi-transparente */
     padding: 10px;
     border-radius: 10px;
     overflow-y: auto;
@@ -71,43 +99,39 @@ html {
     border-radius: 8px;
     padding: 8px;
     margin-bottom: 10px;
-    background: #333;
+    background: rgba(51, 51, 51, 0.6);
+    /* Fondo semi-transparente */
 }
 
 #media-container {
-  flex: 1;
-  position: relative;
-  overflow: hidden;
-  background: #fff;
-  margin-bottom: 20px;
-  margin-left: 20px;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
 
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-
-  max-height: 100%; /* 👈 asegura que nunca crezca más allá de su contenedor padre */
+    margin-bottom: 20px;
+    margin-left: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    max-height: 100%;
 }
 
 #media-container img,
 #media-container video {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  margin: auto;
-
-  width: auto;
-  height: auto;
-  max-width: 100%;
-  max-height: 100%;
-
-  object-fit: contain;
-  object-position: center;
-
-  border-radius: 10px;
-  display: block;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
+    border-radius: 10px;
+    display: block;
 }
 
 img,
@@ -117,20 +141,7 @@ video {
     border-radius: 10px;
 }
 
-/* 🟩 Inferior */
-.inferior {
-    height: 200px;
-    display: flex;
-}
-
-.inferior>div {
-    flex: 1;
-    border: 1px solid #444;
-    padding: 10px;
-    text-align: center;
-}
-
-/* Responsivo */
+/* Responsive */
 @media (max-width: 768px) {
     .centro {
         flex-direction: column;
@@ -152,7 +163,7 @@ video {
     }
 }
 
-/* NUEVO: Contenedor de filas Paciente - Estado */
+/* Contenedor de filas Paciente - Estado */
 .datos-container {
     flex: 1;
     display: flex;
@@ -160,22 +171,24 @@ video {
     justify-content: flex-start;
     gap: 15px;
     padding: 20px;
+    background-color: #0c348c;
+    margin-right: 20px;
+    border-radius: 10px;
+    background: linear-gradient(to right, #0c348c, #4678e8);
 }
 
-/* Títulos */
 .titulos-fila {
     display: flex;
     justify-content: center;
     align-items: center;
     height: calc(100% / 5 - 15px);
-    /* Igual altura que .fila */
-    font-size: 2rem;
-    /* Mismo tamaño de texto */
+    font-size: 4rem;
+    /* antes 2rem */
     font-weight: bold;
-    color: #0c348c;
-
+    color: #ffffff;
     border-radius: 8px;
     overflow: hidden;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .titulo {
@@ -183,49 +196,36 @@ video {
     text-align: center;
 }
 
-/* Cada fila Paciente | Estado */
 .fila {
     display: flex;
     width: 100%;
     height: calc(100% / 5 - 15px);
-    /* Igual altura que .fila */
-    font-size: 2rem;
-    /* Aumentado */
-    border: 2px solid #0c348c;
+    font-size: 3rem;
+    /* antes 2rem */
+    border: 2px solid #053b17;
     border-radius: 8px;
     overflow: hidden;
-    background: #bdcff7;
+    background: #1c7c3c;
 }
 
-/* Cada celda */
 .dato {
     flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 2rem;
-    /* Aumentado */
+    font-size: 3rem;
+    /* antes 2rem */
     font-weight: bold;
-    color: #0c348c;
+    color: #ffffff;
     text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .izquierda {
-    border-right: 2px dashed #0c348c;
+    border-right: 2px dashed #053b17;
 }
 
-.logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.logo-img {
-    max-height: 100%;
-    max-width: 100%;
-    object-fit: contain;
-}
-
+/* FECHA Y HORA ahora en el tercer cajón inferior */
 .fecha-hora {
     display: flex;
     flex-direction: column;
@@ -233,11 +233,147 @@ video {
     align-items: center;
     font-size: 2rem;
     font-weight: bold;
-color: #0c348c;
+    color: #0c348c;
     padding: 10px;
     text-align: center;
     line-height: 1.4;
 
-  
+    border-radius: 10px;
+}
 
+.inferior {
+    display: flex;
+    height: 200px;
+}
+
+.inferior>div {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    overflow: hidden;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.titulos-fila-inferior {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 10px;
+    overflow: hidden;
+}
+
+.titulo-inferior {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to right, #0c348c, #4678e8);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+    position: relative;
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 2.2rem;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    min-width: 0;
+}
+
+.scroll-contenedor {
+    display: flex;
+    white-space: nowrap;
+    animation: scroll-horizontal 25s linear infinite;
+    will-change: transform;
+    flex-shrink: 0;
+}
+
+.scroll-texto {
+    flex-shrink: 0;
+    padding-right: 100px;
+}
+
+@keyframes scroll-horizontal {
+    from {
+        transform: translateX(0%);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.pie-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.contenido-pie {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0c348c;
+    border-radius: 10px;
+    padding: 10px 15px;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(to right, #0c348c, #4678e8);
+    gap: 15px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.qr-icon {
+    height: 100%;
+    width: auto;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.referencia-texto {
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.4rem;
+    text-align: left;
+    line-height: 1.2;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.bloque-inferior {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+
+}
+
+.contenedor-fecha {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #0c348c;
+    border-radius: 10px;
+    padding: 10px 15px;
+    height: 100%;
+    width: 100%;
+    gap: 15px;
+    background: linear-gradient(to right, #0c348c, #4678e8);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.texto-fecha-hora {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #ffffff;
+    padding: 10px;
+    text-align: center;
 }

@@ -4,16 +4,19 @@ const path = require('path');
 const fs = require('fs');
 const { Server } = require('socket.io');
 
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
 const PORT = 3000;
-const IP_LOCAL = '192.168.137.1';
+const IP_LOCAL = '192.168.0.11';
 
 const HISTORIAL_PATH = path.join(__dirname, 'historial.json');
 const MEDIA_FOLDER = path.join(__dirname, '../media');
 const DATOS_PATH = path.join(__dirname, 'datos.json');
+
+
 
 // ===================
 // Inicializar columnas
@@ -53,7 +56,9 @@ function emitirDatosActualizados() {
 // Rutas estáticas y API
 // ===================
 app.use(express.static(path.join(__dirname, '../public')));
-app.use('/media', express.static(MEDIA_FOLDER));
+app.use('/media', express.static(path.join(__dirname, '../media')));
+
+
 app.use(express.json());
 
 app.get('/media-files', (req, res) => {
@@ -135,3 +140,6 @@ io.on('connection', (socket) => {
 server.listen(PORT, IP_LOCAL, () => {
   console.log(`🟢 Servidor corriendo en http://${IP_LOCAL}:${PORT}`);
 });
+
+
+
