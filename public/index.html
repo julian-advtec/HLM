@@ -1,58 +1,108 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8">
-  <title>Usuario</title>
+    <meta charset="UTF-8">
+    <title>Usuario</title>
+    <link rel="stylesheet" href="/style.css" />
 </head>
+
 <body>
-  <h1>Enviar mensaje a TV</h1>
 
-  <form id="formulario">
-    <select id="selector-dato" required>
-      <option value="">Seleccione una opción</option>
-    </select>
-    <input type="text" id="texto2" placeholder="Columna derecha" required>
-    <button type="submit">Enviar</button>
-  </form>
+    <div class="superior">
+        <div class="logo-container">
+            <img src="media/Logo1.png" alt="Logo" class="logo-img">
+        </div>
+    </div>
 
-  
-<script src="/socket.io/socket.io.js"></script>
-<script>
-  const socket = io();
-  const selector = document.getElementById('selector-dato');
-  const form = document.getElementById('formulario');
+    <div class="fila-vertical">
+        <div class="seccion seccion-titulo">
+            <h1>Actualizaciones de estado</h1>
+        </div>
+    </div>
 
-  // Rellena el select con las opciones
-  function actualizarSelector(datos) {
-    selector.innerHTML = '<option value="">Seleccione una opción</option>';
-    datos.forEach(d => {
-      const opt = document.createElement('option');
-      opt.value = d;
-      opt.textContent = d;
-      selector.appendChild(opt);
-    });
-  }
+    <div class="container-form">
+        <div class="form-wrapper">
+            <form id="formulario">
+                <select id="selector-dato" required>
+                    <option value="">Seleccione una opción</option>
+                </select>
+                <select id="estado-dato" required>
+                    <option value="">Seleccione estado</option>
+                    <option value="En preparación">En preparación</option>
+                    <option value="En cirugía">En cirugía</option>
+                    <option value="En recuperación">En recuperación</option>
+                </select>
+                <button type="submit">Agregar</button>
+            </form>
+        </div>
+    </div>
 
-  // Carga inicial del selector desde el servidor
-  fetch('/api/datos')
-    .then(res => res.json())
-    .then(actualizarSelector);
+    <div class="datos-container" id="datos-container">
+        <div class="titulos-fila">
+            <div class="titulo">Paciente</div>
+            <div class="titulo">Estado</div>
+        </div>
+    </div>
 
-  // Recibe actualizaciones del servidor en tiempo real
-  socket.on('actualizar-datos', (datos) => {
-    actualizarSelector(datos);
-  });
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const selector = document.getElementById('selector-dato');
+        const estado = document.getElementById('estado-dato');
+        const form = document.getElementById('formulario');
 
-  // Enviar formulario
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const t1 = selector.value;
-    const t2 = document.getElementById('texto2').value;
-    if (!t1 || !t2) return;
-    socket.emit('nuevo-dato', { textos: [t1, t2] });
-    form.reset();
-    selector.selectedIndex = 0;
-  });
-</script>
+        function actualizarSelector(datos) {
+            selector.innerHTML = '<option value="">Seleccione una opción</option>';
+            datos.forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                selector.appendChild(opt);
+            });
+        }
+
+        fetch('/api/datos')
+            .then(res => res.json())
+            .then(actualizarSelector);
+
+        socket.on('actualizar-datos', (datos) => {
+            actualizarSelector(datos);
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const t1 = selector.value;
+            const t2 = estado.value;
+            if (!t1 || !t2) return;
+            socket.emit('nuevo-dato', { textos: [t1, t2] });
+            form.reset();
+            selector.selectedIndex = 0;
+        });
+
+        socket.on('update', ([datos0, datos1]) => {
+            const container = document.getElementById('datos-container');
+            const maxToShow = 5;
+
+            container.innerHTML = `
+                <div class="titulos-fila">
+                    <div class="titulo">Paciente</div>
+                    <div class="titulo">Estado</div>
+                </div>
+            `;
+
+            for (let i = 0; i < maxToShow; i++) {
+                const paciente = datos0[i] || '';
+                const estado = datos1[i] || '';
+                container.innerHTML += `
+                    <div class="fila">
+                        <div class="dato izquierda">${paciente}</div>
+                        <div class="dato derecha">${estado}</div>
+                    </div>
+                `;
+            }
+        });
+    </script>
 </body>
+
 </html>

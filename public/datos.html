@@ -8,7 +8,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Administrar Datos</title>
+    <title>Administrar ingresos</title>
     <link rel="stylesheet" href="/datos.css" />
 </head>
 
@@ -35,7 +35,7 @@
             <div class="seccion seccion-formulario">
                 <form id="form-dato">
                     <div class="form-row">
-                        <input type="text" id="nuevo-dato" placeholder="Nuevo dato" required />
+                        <input type="text" id="nuevo-dato" placeholder="Nuevo ingreso" required />
                         <button type="submit">Agregar</button>
                     </div>
                 </form>
@@ -47,44 +47,44 @@
                 <ul id="lista-datos"></ul>
             </div>
 
-    </div>
+        </div>
 
-    <script>
-        const lista = document.getElementById('lista-datos');
-        const form = document.getElementById('form-dato');
-        const input = document.getElementById('nuevo-dato');
+        <script>
+            const lista = document.getElementById('lista-datos');
+            const form = document.getElementById('form-dato');
+            const input = document.getElementById('nuevo-dato');
 
-        async function cargarDatos() {
-            const res = await fetch('/api/datos');
-            const datos = await res.json();
-            lista.innerHTML = '';
-            datos.forEach((d, i) => {
-                const li = document.createElement('li');
-                li.textContent = d;
-                const btn = document.createElement('button');
-                btn.textContent = 'X';
-                btn.onclick = async () => {
-                    await fetch('/api/datos/' + i, { method: 'DELETE' });
-                    cargarDatos();
-                };
-                li.appendChild(btn);
-                lista.appendChild(li);
+            async function cargarDatos() {
+                const res = await fetch('/api/datos');
+                const datos = await res.json();
+                lista.innerHTML = '';
+                datos.forEach((d, i) => {
+                    const li = document.createElement('li');
+                    li.textContent = d;
+                    const btn = document.createElement('button');
+                    btn.textContent = 'X';
+                    btn.onclick = async () => {
+                        await fetch('/api/datos/' + i, { method: 'DELETE' });
+                        cargarDatos();
+                    };
+                    li.appendChild(btn);
+                    lista.appendChild(li);
+                });
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await fetch('/api/datos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ valor: input.value })
+                });
+                input.value = '';
+                cargarDatos();
             });
-        }
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            await fetch('/api/datos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ valor: input.value })
-            });
-            input.value = '';
             cargarDatos();
-        });
-
-        cargarDatos();
-    </script>
+        </script>
 
 
 

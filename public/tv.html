@@ -6,158 +6,141 @@
     <title>Vista</title>
     <script src="/socket.io/socket.io.js"></script>
     <link rel="stylesheet" href="/tv.css">
-
 </head>
 
 <body>
     <div class="tv-container">
-        <div class="superior">
-            <div class="logo-container">
+        <div class="columna-izquierda">
+            <div class="superior-izquierda">
+                <div class="fecha-hora-contenedor">
+                    <div class="fecha-hora" id="fechaHora"></div>
+                </div>
                 <img src="media/Logo1.png" alt="Logo" class="logo-img">
             </div>
-
-        </div>
-
-
-        <!-- 🟨 Centro -->
-        <div class="centro">
-
             <div id="media-container">
                 <img id="media-image" style="display:none;" />
                 <video id="media-video" autoplay loop muted style="display:none;"></video>
             </div>
+        </div>
 
-
+        <div class="columna-derecha">
             <div class="datos-container" id="datos-container">
                 <div class="titulos-fila">
-                    <div class="titulo">Paciente</div>
-                    <div class="titulo">Estado</div>
-                </div>
-            </div>
-
-
-        </div>
-
-        <div class="inferior">
-            <div class="pie-item">
-                <div class="contenido-pie">
-                    <img src="media/FaWfJC.svg" alt="Código QR Hospital La María" class="qr-icon" />
-                    <div class="referencia-texto">
-                        Escanea este código QR para acceder a la página principal del Hospital La María.
-                    </div>
-                </div>
-            </div>
-
-            <div class="titulos-fila-inferior">
-                <div class="titulo-inferior">
-                    <div class="scroll-contenedor">
-                        <span class="scroll-texto">
-                            Bienvenidos al E.S.E Hospital La María ● Bienvenidos al E.S.E Hospital La María ●
-                        </span>
-                        <span class="scroll-texto">
-                            Bienvenidos al E.S.E Hospital La María ● Bienvenidos al E.S.E Hospital La María ●
-                        </span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="bloque-inferior">
-                <div class="contenedor-fecha">
-                    <div class="texto-fecha-hora" id="fechaHora"></div>
+                    <div class="titulo paciente">Paciente</div>
+                    <div class="titulo estado">Estado</div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <script>
-            const socket = io();
-            const mediaImg = document.getElementById('media-image');
-            const mediaVid = document.getElementById('media-video');
+    <audio id="sonido-actualizacion" src="media/notificacion.mp3" preload="auto"></audio>
 
-            socket.on('update', ([datos0, datos1]) => {
-                const container = document.getElementById('datos-container');
-                const maxToShow = 5;
 
-                container.innerHTML = `
-        <div class="titulos-fila">
-          <div class="titulo">Paciente</div>
-          <div class="titulo">Estado</div>
-        </div>
-      `;
+    <script>
+        const socket = io();
+        let pacientes = [];
+        let estados = [];
+        let rotIndex = 0;
+        const mostrar = 9;
+        let rotInt;
 
-                for (let i = 0; i < maxToShow; i++) {
-                    const paciente = datos0[i] || '';
-                    const estado = datos1[i] || '';
-                    container.innerHTML += `
-          <div class="fila">
-            <div class="dato izquierda">${paciente}</div>
-            <div class="dato derecha">${estado}</div>
-          </div>
-        `;
+        socket.on('update', ([d0, d1]) => {
+            const map = new Map();
+            for (let i = 0; i < d0.length; i++) map.set(d0[i], d1[i]);
+            const keys = Array.from(map.keys()).sort();
+
+            pacientes = keys.filter((_, idx) => true);
+            estados = pacientes.map((p) => map.get(p));
+
+            const newestP = d0[0];
+            const newestE = d1[0];
+            const idxN = pacientes.indexOf(newestP);
+            if (idxN !== -1) {
+                pacientes.splice(idxN, 1);
+                estados.splice(idxN, 1);
+            }
+            rotIndex = 0;
+
+            const prev = document.querySelector('.fila .dato')?.textContent || '';
+            const hasChange = prev !== newestP;
+
+            render(newestP, newestE, hasChange);
+
+            clearInterval(rotInt);
+            rotInt = setInterval(() => {
+                render(newestP, newestE, false);
+                rotIndex = (rotIndex + mostrar) % pacientes.length;
+            }, 10000);
+        });
+
+        function render(p0, e0, playSound) {
+            const cont = document.getElementById('datos-container');
+            cont.innerHTML = `
+    <div class="titulos-fila">
+      <div class="titulo paciente">Paciente</div>
+      <div class="titulo estado">Estado</div>
+    </div>`;
+
+            cont.innerHTML += `
+    <div class="fila ${playSound ? 'actualizada' : ''}">
+      <div class="dato">${p0}</div><div class="dato">${e0}</div>
+    </div>`;
+
+            for (let i = 0; i < mostrar; i++) {
+                const idx = (rotIndex + i) % pacientes.length;
+                cont.innerHTML += `
+      <div class="fila">
+        <div class="dato">${pacientes[idx]}</div><div class="dato">${estados[idx]}</div>
+      </div>`;
+            }
+
+            if (playSound) document.getElementById('sonido-actualizacion').play();
+        }
+
+        // multimedia
+        let media = [], idx = 0;
+        fetch('/media-files')
+            .then((r) => r.json())
+            .then((f) => {
+                media = f;
+                if (media.length) {
+                    cycleMedia();
+                    setInterval(cycleMedia, 30000);
                 }
             });
 
-            let mediaFiles = [], mediaIndex = 0;
+        function cycleMedia() {
+            const file = media[idx];
+            const url = `/media/${file}`;
+            const ext = file.split('.').pop().toLowerCase();
+            const img = document.getElementById('media-image');
+            const vid = document.getElementById('media-video');
 
-            fetch('/media-files')
-                .then(res => res.json())
-                .then(files => {
-                    mediaFiles = files;
-                    if (mediaFiles.length > 0) {
-                        mostrarMedia();
-                        setInterval(mostrarMedia, 30000);
-                    }
-                });
-
-            function mostrarMedia() {
-                if (!mediaFiles.length) return;
-                const file = mediaFiles[mediaIndex];
-                const url = `/media/${file}`;
-                const ext = file.split('.').pop().toLowerCase();
-
-                if (['mp4', 'webm'].includes(ext)) {
-                    mediaImg.style.display = 'none';
-                    mediaVid.src = url;
-                    mediaVid.style.display = 'block';
-                } else {
-                    mediaVid.style.display = 'none';
-                    mediaImg.src = url;
-                    mediaImg.style.display = 'block';
-                }
-
-                mediaIndex = (mediaIndex + 1) % mediaFiles.length;
+            if (['mp4', 'webm'].includes(ext)) {
+                img.style.display = 'none';
+                vid.src = url;
+                vid.style.display = 'block';
+            } else {
+                vid.style.display = 'none';
+                img.src = url;
+                img.style.display = 'block';
             }
+            idx = (idx + 1) % media.length;
+        }
 
-            function actualizarFechaHora() {
-                const ahora = new Date();
+        // fecha/hora
+        function refreshTime() {
+            const d = new Date();
+            const dia = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'][d.getDay()];
+            const mes = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'][d.getMonth()];
+            const dt = `${dia}, ${String(d.getDate()).padStart(2, '0')} de ${mes} de ${d.getFullYear()}`;
+            const tm = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            document.getElementById('fechaHora').innerHTML = `<div>${dt}</div><div>${tm}</div>`;
+        }
+        setInterval(refreshTime, 1000);
+        refreshTime();
+    </script>
 
-                const dias = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
-                const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-                    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-
-                const diaSemana = dias[ahora.getDay()];
-                const dia = ahora.getDate().toString().padStart(2, '0');
-                const mes = meses[ahora.getMonth()];
-                const año = ahora.getFullYear();
-
-                const hora = ahora.getHours().toString().padStart(2, '0');
-                const minutos = ahora.getMinutes().toString().padStart(2, '0');
-                const segundos = ahora.getSeconds().toString().padStart(2, '0');
-
-                const fechaTexto = `${diaSemana}, ${dia} de ${mes} de ${año}`;
-                const horaTexto = `${hora}:${minutos}:${segundos}`;
-
-                document.getElementById('fechaHora').innerHTML = `
-    <div>${fechaTexto}</div>
-    <div>${horaTexto}</div>
-  `;
-            }
-
-            setInterval(actualizarFechaHora, 1000);
-            actualizarFechaHora();
-
-
-
-        </script>
 </body>
 
 </html>
