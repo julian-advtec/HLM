@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Usuario</title>
-    <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/usuario.css" />
 </head>
 
 <body>
@@ -51,6 +51,7 @@
         const selector = document.getElementById('selector-dato');
         const estado = document.getElementById('estado-dato');
         const form = document.getElementById('formulario');
+        const container = document.getElementById('datos-container');
 
         function actualizarSelector(datos) {
             selector.innerHTML = '<option value="">Seleccione una opción</option>';
@@ -72,37 +73,73 @@
 
         form.addEventListener('submit', (e) => {
             e.preventDefault();
-            const t1 = selector.value;
-            const t2 = estado.value;
-            if (!t1 || !t2) return;
-            socket.emit('nuevo-dato', { textos: [t1, t2] });
+            const nombre = selector.value;
+            const nuevoEstado = estado.value;
+            if (!nombre || !nuevoEstado) return;
+
+            socket.emit('actualizar-estado', { nombre, nuevoEstado });
+
             form.reset();
             selector.selectedIndex = 0;
+            estado.innerHTML = '<option value="">Seleccione estado</option>';
         });
 
-        socket.on('update', ([datos0, datos1]) => {
-            const container = document.getElementById('datos-container');
-            const maxToShow = 5;
-
+        function renderizarFilas(pacientes, estados) {
             container.innerHTML = `
                 <div class="titulos-fila">
                     <div class="titulo">Paciente</div>
                     <div class="titulo">Estado</div>
                 </div>
             `;
-
-            for (let i = 0; i < maxToShow; i++) {
-                const paciente = datos0[i] || '';
-                const estado = datos1[i] || '';
+            for (let i = 0; i < pacientes.length; i++) {
                 container.innerHTML += `
                     <div class="fila">
-                        <div class="dato izquierda">${paciente}</div>
-                        <div class="dato derecha">${estado}</div>
+                        <div class="dato izquierda">${pacientes[i]}</div>
+                        <div class="dato derecha">${estados[i]}</div>
                     </div>
                 `;
             }
+        }
+
+        socket.on('update', ([pacientes, estados]) => {
+            renderizarFilas(pacientes, estados);
+
+            const datosMap = {};
+            for (let i = 0; i < pacientes.length; i++) {
+                datosMap[pacientes[i]] = estados[i];
+            }
+
+            estado.innerHTML = '<option value="">Seleccione estado</option>';
+            selector.onchange = () => {
+                const sel = selector.value;
+                const actual = datosMap[sel];
+                const siguiente = getEstadoPermitido(actual);
+
+                estado.innerHTML = '<option value="">Seleccione estado</option>';
+                if (siguiente) {
+                    const opt = document.createElement('option');
+                    opt.value = siguiente;
+                    opt.textContent = siguiente;
+                    estado.appendChild(opt);
+                } else if (!actual) {
+                    // Paciente nuevo
+                    ['En preparación'].forEach(e => {
+                        const opt = document.createElement('option');
+                        opt.value = e;
+                        opt.textContent = e;
+                        estado.appendChild(opt);
+                    });
+                }
+            };
         });
+
+        function getEstadoPermitido(estadoActual) {
+            const orden = ['En preparación', 'En cirugía', 'En recuperación'];
+            const index = orden.indexOf(estadoActual);
+            return orden[index + 1] || null;
+        }
     </script>
+
 </body>
 
 </html>

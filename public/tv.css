@@ -4,7 +4,8 @@
     box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     width: 100%;
     font-family: sans-serif;
@@ -49,6 +50,7 @@ html, body {
 .logo-img {
     height: 80px;
     width: auto;
+    margin-right: 30px;
 }
 
 /* Multimedia */
@@ -86,7 +88,6 @@ html, body {
     font-size: calc(3.5vh + 1vw);
     font-weight: bold;
     color: white;
-    border-bottom: 2px solid white;
     padding-bottom: 10px;
     flex-shrink: 0;
 }
@@ -140,8 +141,15 @@ html, body {
 
 /* Animación */
 @keyframes parpadeo {
-    0%, 100% { background-color: #1c7c3c; }
-    50% { background-color: #2ecc71; }
+
+    0%,
+    100% {
+        background-color: #1c7c3c;
+    }
+
+    50% {
+        background-color: #2ecc71;
+    }
 }
 
 .fila.actualizada {
