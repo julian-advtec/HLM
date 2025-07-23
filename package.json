@@ -1,27 +1,21 @@
 {
-  "name": "seguimientoc",
+  "name": "seguimientoC",
   "version": "1.0.0",
   "main": "server/server.js",
-  "bin": "server/server.js",
   "scripts": {
     "start": "node server/server.js"
   },
+  "bin": "server/server.js",
   "pkg": {
     "assets": [
-      "public/**/*",
       "branding/**/*",
       "media/**/*",
-      "server/*.json"
-    ],
-    "outputPath": "dist"
+      "public/**/*"
+    ]
   },
   "dependencies": {
-    "express": "^4.21.2",
+    "express": "^4.18.2",
     "node-fetch": "^3.3.2",
-    "socket.io": "^4.8.1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": ""
+    "socket.io": "^4.7.2"
+  }
 }

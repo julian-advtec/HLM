@@ -1,36 +1,30 @@
 const fs = require('fs');
 const path = require('path');
 
-const folders = [
-    path.join(__dirname, '../branding'),
-    path.join(__dirname, '../media')
-];
-
-const files = [
-    {
-        path: path.join(__dirname, 'historial.json'),
-        defaultContent: JSON.stringify([[], []], null, 2)
-    },
-    {
-        path: path.join(__dirname, 'datos.json'),
-        defaultContent: JSON.stringify([], null, 2)
-    }
-];
-
 function ensureEnvironment() {
+    const basePath = process.cwd(); // Donde se ejecuta el EXE
+
+    const folders = ['branding', 'media', 'public', 'server'];
     folders.forEach(folder => {
-        if (!fs.existsSync(folder)) {
-            fs.mkdirSync(folder, { recursive: true });
+        const fullPath = path.join(basePath, folder);
+        if (!fs.existsSync(fullPath)) {
+            fs.mkdirSync(fullPath, { recursive: true });
             console.log(`📁 Carpeta creada: ${folder}`);
         }
     });
 
-    files.forEach(file => {
-        if (!fs.existsSync(file.path)) {
-            fs.writeFileSync(file.path, file.defaultContent);
-            console.log(`📄 Archivo creado: ${file.path}`);
-        }
-    });
+    const historialPath = path.join(basePath, 'server', 'historial.json');
+    const datosPath = path.join(basePath, 'server', 'datos.json');
+
+    if (!fs.existsSync(historialPath)) {
+        fs.writeFileSync(historialPath, JSON.stringify([[], []], null, 2));
+        console.log('📝 Archivo historial.json creado');
+    }
+
+    if (!fs.existsSync(datosPath)) {
+        fs.writeFileSync(datosPath, JSON.stringify([], null, 2));
+        console.log('📝 Archivo datos.json creado');
+    }
 }
 
 module.exports = { ensureEnvironment };

@@ -4,19 +4,20 @@ const path = require('path');
 const fs = require('fs');
 const { Server } = require('socket.io');
 
+const { ensureEnvironment } = require('./setupFolders');
+ensureEnvironment();
+
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
 const PORT = 3000;
-const IP_LOCAL = '192.168.0.11';
+const IP_LOCAL = '0.0.0.0'; // Escucha en toda la red
 
-const HISTORIAL_PATH = path.join(__dirname, 'historial.json');
-const MEDIA_FOLDER = path.join(__dirname, '../media');
-const DATOS_PATH = path.join(__dirname, 'datos.json');
-
-const { ensureEnvironment } = require('./setupFolders');
-ensureEnvironment();
+const BASE_PATH = process.cwd(); // Donde se ejecuta el EXE
+const HISTORIAL_PATH = path.join(BASE_PATH, 'server', 'historial.json');
+const DATOS_PATH = path.join(BASE_PATH, 'server', 'datos.json');
+const MEDIA_FOLDER = path.join(BASE_PATH, 'media');
 
 // ===================
 // Inicializar columnas
@@ -55,9 +56,9 @@ function emitirDatosActualizados() {
 // ===================
 // Rutas estáticas y API
 // ===================
-app.use(express.static(path.join(__dirname, '../public')));
-app.use('/media', express.static(path.join(__dirname, '../media')));
-app.use('/branding', express.static(path.join(__dirname, '../branding'))); // 👈 Agregado
+app.use(express.static(path.join(BASE_PATH, 'public')));
+app.use('/media', express.static(path.join(BASE_PATH, 'media')));
+app.use('/branding', express.static(path.join(BASE_PATH, 'branding')));
 app.use(express.json());
 
 app.get('/media-files', (req, res) => {
@@ -99,21 +100,18 @@ app.delete('/api/datos/:index', (req, res) => {
     guardarDatos(datos);
     emitirDatosActualizados();
 
-    // 🔁 Eliminar del historial también
     fs.readFile(HISTORIAL_PATH, 'utf8', (err, data) => {
         if (!err) {
             try {
                 let columnas = JSON.parse(data);
                 let indices = [];
 
-                // Buscar todos los índices con ese dato
                 for (let i = 0; i < columnas[0].length; i++) {
                     if (columnas[0][i] === eliminado) {
                         indices.push(i);
                     }
                 }
 
-                // Eliminar en reversa para evitar problemas de índice
                 for (let i = indices.length - 1; i >= 0; i--) {
                     columnas[0].splice(indices[i], 1);
                     columnas[1].splice(indices[i], 1);
@@ -121,7 +119,7 @@ app.delete('/api/datos/:index', (req, res) => {
 
                 fs.writeFile(HISTORIAL_PATH, JSON.stringify(columnas, null, 2), err => {
                     if (err) console.error('Error actualizando historial tras eliminación:', err);
-                    io.emit('update', columnas); // ✅ Emitir cambio a TVs
+                    io.emit('update', columnas);
                 });
             } catch (e) {
                 console.error('Error procesando historial al eliminar:', e);
@@ -136,7 +134,7 @@ app.delete('/api/datos/:index', (req, res) => {
 // WebSocket
 // ===================
 io.on('connection', (socket) => {
-    console.log('📡 Cliente conectado');
+    console.log('🔌 Cliente conectado');
 
     socket.emit('update', columnas);
     socket.emit('actualizar-datos', leerDatos());
@@ -210,7 +208,3 @@ io.on('connection', (socket) => {
 server.listen(PORT, IP_LOCAL, () => {
     console.log(`🟢 Servidor corriendo en http://${IP_LOCAL}:${PORT}`);
 });
-
-
-
-
