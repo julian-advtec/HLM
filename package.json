@@ -2,14 +2,23 @@
   "name": "seguimientoc",
   "version": "1.0.0",
   "main": "server/server.js",
+  "bin": "server/server.js",
   "scripts": {
     "start": "node server/server.js"
+  },
+  "pkg": {
+    "assets": [
+      "public/**/*",
+      "branding/**/*",
+      "media/**/*",
+      "server/*.json"
+    ],
+    "outputPath": "dist"
   },
   "dependencies": {
     "express": "^4.21.2",
     "node-fetch": "^3.3.2",
-    "socket.io": "^4.8.1",
-    "undici": "^7.12.0"
+    "socket.io": "^4.8.1"
   },
   "keywords": [],
   "author": "",

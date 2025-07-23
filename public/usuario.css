@@ -5,13 +5,18 @@
     padding: 0;
 }
 
-html, body {
+html,
+body {
     height: 100%;
     width: 100%;
     font-family: sans-serif;
-    background: #ffffff url('/media/fondo1.png') no-repeat center center fixed;
+    background: #ffffff url('/branding/Fondo.png') no-repeat center center fixed;
     background-size: cover;
     overflow-x: hidden;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
 }
 
 /* TITULO GENERAL */
@@ -24,14 +29,15 @@ h1 {
     font-size: 2rem;
 }
 
-/* FORMULARIO */
-/* CONTENEDOR PRINCIPAL DEL FORMULARIO */
+
 .container-form {
     background: linear-gradient(to right, #0c348c, #4678e8);
     padding: 20px;
     border-radius: 10px;
-    display: inline-block; /* Tamaño automático basado en su contenido */
-    margin: 20px auto;
+    display: inline-block;
+    margin-top: 40px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 1.6);
 }
 
 /* CONTENEDOR FLEXIBLE PARA ALINEAR SELECTS Y BOTÓN */
@@ -45,15 +51,16 @@ h1 {
 
 /* SELECTS AJUSTADOS */
 select {
-    padding: 10px;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: none;
-    outline: none;
-    min-width: 200px;
-    max-width: 300px;
+    max-width: 100%;
     width: 100%;
-    background-color: white;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+/* Limitar altura del menú desplegado */
+select option {
+    max-height: 2rem;
 }
 
 .form-wrapper {
@@ -64,7 +71,8 @@ select {
     width: 100%;
 }
 
-input, select {
+input,
+select {
     padding: 10px;
     font-size: 1rem;
     border-radius: 6px;
@@ -74,6 +82,7 @@ input, select {
     max-width: 300px;
     width: 100%;
     background-color: white;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 1.6);
 }
 
 input::placeholder {
@@ -84,13 +93,15 @@ input::placeholder {
 /* BOTÓN */
 button {
     padding: 14px 24px;
-    font-size: 1.1rem;
+    font-size: 2rem;
     background-color: #1c7c3c;
     color: white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
     white-space: nowrap;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 1.6);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 button:hover {
@@ -106,9 +117,13 @@ button:hover {
     font-size: 1.8rem;
     font-weight: bold;
     text-align: center;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
-    margin-bottom: 10px;
-    width: 100%;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 1.6);
+    margin: 0 auto 10px auto;
+    width: fit-content;
+
+    margin-top: 40px;
+    margin-bottom: 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 1.6);
 }
 
 
@@ -139,23 +154,38 @@ button:hover {
     min-width: 250px;
 }
 
-.card .paciente, .card .estado {
+.card .paciente,
+.card .estado {
     flex: 1;
     text-align: center;
 }
 
 /* SECCIÓN DE PACIENTES EN TV */
 .datos-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
     padding: 20px;
     background: linear-gradient(to right, #0c348c, #4678e8);
-    margin: 20px;
     border-radius: 10px;
+    max-height: 50vh;
+    overflow-y: auto;
+    margin-left: 40px;
+    margin-right: 40px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 1.6);
 }
 
+/* Estilo más pequeño solo para el selector de paciente */
+#selector-dato {
+    font-size: 2rem;
+    padding: 6px 10px;
+
+    width: auto;
+}
+
+
 .titulos-fila {
+    grid-column: 1 / -1;
     display: flex;
     justify-content: space-between;
     font-size: 2rem;
@@ -164,6 +194,7 @@ button:hover {
     text-align: center;
 }
 
+
 .titulo {
     flex: 1;
     text-align: center;
@@ -171,24 +202,28 @@ button:hover {
 
 .fila {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     background: #1c7c3c;
     border-radius: 8px;
-    overflow: hidden;
-    font-size: 1.8rem;
+    font-size: 1.6rem;
+    text-align: center;
+    padding: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 1.6);
 }
 
 .dato {
-    flex: 1;
-    text-align: center;
     padding: 10px;
     color: white;
     font-weight: bold;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.6);
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
 }
 
 .izquierda {
-    border-right: 2px dashed #053b17;
+    border-bottom: 2px dashed #053b17;
+}
+
+.derecha {
+    margin-top: 8px;
 }
 
 /* MEDIA */
@@ -210,6 +245,7 @@ button:hover {
     justify-content: center;
     align-items: center;
     margin: 20px;
+    padding: 20px 0px;
 }
 
 .logo-img {
@@ -217,7 +253,7 @@ button:hover {
     object-fit: contain;
 }
 
-/* RESPONSIVE: COLUMNA EN PANTALLAS PEQUEÑAS */
+
 @media (max-width: 768px) {
     .form-wrapper {
         flex-direction: column;
@@ -232,4 +268,24 @@ button:hover {
         font-size: 1.5rem;
         padding: 10px 20px;
     }
+}
+
+.form-horizontal {
+    display: inline-flex;
+    /* 👈 se adapta al contenido, no ocupa todo el ancho */
+    align-items: center;
+    gap: 16px;
+    /* espacio entre elementos */
+    padding: 10px;
+    border-radius: 8px;
+
+}
+
+/* Elementos dentro del form */
+.form-horizontal select {
+    font-size: 2rem;
+    padding: 8px 12px;
+    white-space: nowrap;
+    width: auto;
+    max-width: none;
 }

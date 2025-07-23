@@ -15,6 +15,9 @@ const HISTORIAL_PATH = path.join(__dirname, 'historial.json');
 const MEDIA_FOLDER = path.join(__dirname, '../media');
 const DATOS_PATH = path.join(__dirname, 'datos.json');
 
+const { ensureEnvironment } = require('./setupFolders');
+ensureEnvironment();
+
 // ===================
 // Inicializar columnas
 // ===================
@@ -54,6 +57,7 @@ function emitirDatosActualizados() {
 // ===================
 app.use(express.static(path.join(__dirname, '../public')));
 app.use('/media', express.static(path.join(__dirname, '../media')));
+app.use('/branding', express.static(path.join(__dirname, '../branding'))); // 👈 Agregado
 app.use(express.json());
 
 app.get('/media-files', (req, res) => {
