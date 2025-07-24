@@ -185,7 +185,7 @@ io.on('connection', (socket) => {
 });
 
 // Iniciar servidor
-const START_PORT = 3000;
+const START_PORT = 8080;
 
 function iniciarServidor(puerto) {
     server.listen(puerto, '127.0.0.1', () => {
