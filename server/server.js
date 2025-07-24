@@ -56,9 +56,9 @@ function emitirDatosActualizados() {
 // ===================
 // Rutas estáticas y API
 // ===================
-app.use(express.static(path.join(BASE_PATH, 'public')));
-app.use('/media', express.static(path.join(BASE_PATH, 'media')));
-app.use('/branding', express.static(path.join(BASE_PATH, 'branding')));
+app.use(express.static(path.join(process.cwd(), 'public')));
+app.use('/media', express.static(path.join(process.cwd(), 'media')));
+app.use('/branding', express.static(path.join(process.cwd(), 'branding')));
 app.use(express.json());
 
 app.get('/media-files', (req, res) => {

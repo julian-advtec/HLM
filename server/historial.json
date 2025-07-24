@@ -1,11 +1,11 @@
 [
   [
+    "2",
     "6",
     "7",
     "11",
     "245",
     "333",
-    "2",
     "888",
     "3",
     "5",
@@ -17,18 +17,18 @@
     "8",
     "4321",
     "1234",
-    "12345678",
     "44",
     "13",
     "9",
-    "876"
+    "876",
+    "1"
   ],
   [
+    "En cirugía",
     "En preparación",
     "En preparación",
     "En recuperación",
     "En recuperación",
-    "En preparación",
     "En preparación",
     "En preparación",
     "En cirugía",
@@ -45,6 +45,7 @@
     "En preparación",
     "En recuperación",
     "En recuperación",
-    "En recuperación"
+    "En recuperación",
+    "En preparación"
   ]
 ]
