@@ -1,18 +1,23 @@
 {
   "name": "seguimiento",
   "version": "1.0.0",
-  "main": "server.js",
+  "main": "server/server.js",
   "bin": "server/server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server/server.js"
   },
   "dependencies": {
     "express": "^4.21.2",
     "socket.io": "^4.8.1"
   },
   "pkg": {
-    "scripts": "server/server.js",
-    "assets": [],
+    "assets": [
+      "public/**/*",
+      "branding/**/*",
+      "media/**/*",
+      "server/datos.json",
+      "server/historial.json"
+    ],
     "targets": [
       "node18-win-x64"
     ],
