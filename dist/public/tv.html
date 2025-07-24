@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Vista</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="/tv.css" />
+</head>
+<body>
+    <div class="tv-container">
+        <div class="columna-izquierda">
+            <div class="superior-izquierda">
+                <div class="fecha-hora-contenedor">
+                    <div class="fecha-hora" id="fechaHora"></div>
+                </div>
+                <img src="branding/Logo.png" alt="Logo" class="logo-img" />
+            </div>
+            <div id="media-container">
+                <img id="media-image" style="display: none" />
+                <video id="media-video" autoplay loop muted style="display: none"></video>
+            </div>
+        </div>
+
+        <div class="columna-derecha">
+            <div class="datos-container" id="datos-container">
+                <div class="titulos-fila">
+                    <div class="titulo paciente">Paciente</div>
+                    <div class="titulo estado">Estado</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="sonido-actualizacion" src="branding/notificacion.mp3" preload="auto"></audio>
+
+    <script>
+        const socket = io();
+        let historialCompleto = [];
+        let ultimoCambio = null;
+        let filasRestantes = [];
+        let bloques = [];
+        let bloqueActual = 0;
+
+        socket.on('update', ([d0, d1]) => {
+            // Último cambio literal
+            const pacienteUltimo = d0[d0.length - 1];
+            const estadoUltimo = d1[d1.length - 1];
+            ultimoCambio = [pacienteUltimo, estadoUltimo];
+
+            // Crear mapa de pacientes distintos al último
+            const mapa = new Map();
+            for (let i = d0.length - 1; i >= 0; i--) {
+                const paciente = d0[i];
+                const estado = d1[i];
+                if (paciente !== pacienteUltimo && !mapa.has(paciente)) {
+                    mapa.set(paciente, estado);
+                }
+            }
+
+            // Ordenar por número de paciente y dividir en bloques de 9
+            filasRestantes = Array.from(mapa.entries()).sort((a, b) => Number(a[0]) - Number(b[0]));
+            bloques = [];
+            for (let i = 0; i < filasRestantes.length; i += 9) {
+                bloques.push(filasRestantes.slice(i, i + 9));
+            }
+            bloqueActual = 0;
+
+            render(true);
+        });
+
+        function render(cambio) {
+            const cont = document.getElementById('datos-container');
+            cont.innerHTML = `
+                <div class="titulos-fila">
+                    <div class="titulo paciente">Paciente</div>
+                    <div class="titulo estado">Estado</div>
+                </div>
+            `;
+
+            // Fila 1: Último cambio
+            const fila1 = document.createElement('div');
+            fila1.className = 'fila actualizada';
+            fila1.innerHTML = `
+                <div class="dato">${ultimoCambio?.[0] ?? ''}</div>
+                <div class="dato">${ultimoCambio?.[1] ?? ''}</div>
+            `;
+            cont.appendChild(fila1);
+
+            if (cambio) {
+                const sonido = document.getElementById('sonido-actualizacion');
+                sonido?.play();
+                fila1.classList.add('parpadeo');
+                setTimeout(() => fila1.classList.remove('parpadeo'), 10000);
+            }
+
+            // Filas 2 a 10: del bloque actual
+            const bloque = bloques[bloqueActual] || [];
+            for (let i = 0; i < 9; i++) {
+                const [paciente, estado] = bloque[i] || ['', ''];
+                const fila = document.createElement('div');
+                fila.className = 'fila';
+                fila.innerHTML = `
+                    <div class="dato">${paciente}</div>
+                    <div class="dato">${estado}</div>
+                `;
+                cont.appendChild(fila);
+            }
+        }
+
+        // Rotar bloque cada 10 segundos
+        setInterval(() => {
+            if (bloques.length > 1) {
+                bloqueActual = (bloqueActual + 1) % bloques.length;
+                render(false);
+            }
+        }, 10000);
+
+        // Reloj en tiempo real
+        function refreshTime() {
+            const d = new Date();
+            const dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const fecha = `${dias[d.getDay()]}, ${String(d.getDate()).padStart(2, '0')} de ${meses[d.getMonth()]} de ${d.getFullYear()}`;
+            const hora = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+            document.getElementById('fechaHora').innerHTML = `<div>${fecha}</div><div>${hora}</div>`;
+        }
+
+        setInterval(refreshTime, 1000);
+        refreshTime();
+
+        // Media rotativo
+        let media = [], idx = 0;
+        fetch('/media-files')
+            .then(res => res.json())
+            .then(files => {
+                media = files;
+                if (media.length) {
+                    cycleMedia();
+                    setInterval(cycleMedia, 30000);
+                }
+            });
+
+        function cycleMedia() {
+            const file = media[idx];
+            const ext = file.split('.').pop().toLowerCase();
+            const img = document.getElementById('media-image');
+            const vid = document.getElementById('media-video');
+
+            if (['mp4', 'webm'].includes(ext)) {
+                img.style.display = 'none';
+                vid.src = `/media/${file}`;
+                vid.style.display = 'block';
+            } else {
+                vid.style.display = 'none';
+                img.src = `/media/${file}`;
+                img.style.display = 'block';
+            }
+
+            idx = (idx + 1) % media.length;
+        }
+    </script>
+</body>
+</html>

@@ -2,7 +2,7 @@
   "name": "seguimiento",
   "version": "1.0.0",
   "main": "server.js",
-    "bin": "server/server.js",
+  "bin": "server/server.js",
   "scripts": {
     "start": "node server.js"
   },
@@ -11,17 +11,11 @@
     "socket.io": "^4.8.1"
   },
   "pkg": {
-    "scripts": "server.js",
-    "assets": [
-      "../public/**/*",
-      "../branding/**/*",
-      "../media/**/*",
-      "historial.json",
-      "datos.json"
-    ],
+    "scripts": "server/server.js",
+    "assets": [],
     "targets": [
       "node18-win-x64"
     ],
-    "outputPath": "../dist"
+    "outputPath": "dist"
   }
 }
