@@ -188,7 +188,7 @@ io.on('connection', (socket) => {
 const START_PORT = 3000;
 
 function iniciarServidor(puerto) {
-    server.listen(puerto, 'localhost', () => {
+    server.listen(puerto, '127.0.0.1', () => {
         console.log(`🟢 Servidor corriendo en http://localhost:${puerto}`);
     }).on('error', (err) => {
         if (err.code === 'EADDRINUSE') {
