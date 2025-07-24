@@ -1,30 +1,27 @@
 {
-  "name": "seguimientoC",
+  "name": "seguimiento",
   "version": "1.0.0",
-  "description": "Servidor local para seguimiento quirúrgico",
-  "main": "server/server.js",
+  "main": "server.js",
+    "bin": "server/server.js",
   "scripts": {
-    "start": "node server/server.js"
+    "start": "node server.js"
   },
-  "bin": "server/server.js",
   "dependencies": {
-    "express": "^4.18.2",
-    "open": "^9.2.0",
-    "socket.io": "^4.7.2"
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
   },
   "pkg": {
+    "scripts": "server.js",
     "assets": [
-      "public/**/*",
-      "branding/**/*",
-      "media/**/*"
-    ],
-    "scripts": [
-      "server/**/*.js"
+      "../public/**/*",
+      "../branding/**/*",
+      "../media/**/*",
+      "historial.json",
+      "datos.json"
     ],
     "targets": [
       "node18-win-x64"
     ],
-    "outputPath": "dist"
+    "outputPath": "../dist"
   }
 }
-
