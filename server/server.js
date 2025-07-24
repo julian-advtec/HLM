@@ -8,8 +8,6 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const PORT = 3000;
-const IP_LOCAL = '0.0.0.0';
 
 const isPkg = typeof process.pkg !== 'undefined';
 const BASE_PATH = isPkg ? path.dirname(process.execPath) : __dirname;
@@ -187,6 +185,19 @@ io.on('connection', (socket) => {
 });
 
 // Iniciar servidor
-server.listen(PORT, IP_LOCAL, () => {
-    console.log(`🟢 Servidor corriendo en http://localhost:${PORT}`);
-});
+const START_PORT = 3000;
+
+function iniciarServidor(puerto) {
+    server.listen(puerto, 'localhost', () => {
+        console.log(`🟢 Servidor corriendo en http://localhost:${puerto}`);
+    }).on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log(`⚠️ Puerto ${puerto} en uso. Probando siguiente...`);
+            iniciarServidor(puerto + 1);
+        } else {
+            console.error('Error iniciando servidor:', err);
+        }
+    });
+}
+
+iniciarServidor(START_PORT);
