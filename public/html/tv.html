@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Vista</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" href="../css/tv.css" />
+    <link rel="icon" href="../../branding/Logo.png" type="image/x-icon" />
+</head>
+
+<body>
+    <div class="tv-container">
+        <div class="columna-izquierda">
+            <div class="superior-izquierda">
+                <div class="fecha-hora-contenedor">
+                    <div class="fecha-hora" id="fechaHora"></div>
+                </div>
+                <img src="../../branding/Logo.png" alt="Logo" class="logo-img" />
+            </div>
+            <div id="media-container">
+                <img id="media-image" style="display: none" />
+                <video id="media-video" autoplay loop muted style="display: none"></video>
+            </div>
+        </div>
+
+        <div class="columna-derecha">
+            <div class="datos-container" id="datos-container">
+                <div class="titulos-fila">
+                    <div class="titulo paciente">Registro de paciente</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="sonido-actualizacion" src="branding/notificacion.mp3" preload="auto"></audio>
+
+
+
+    <script src="/js/socket.io.min.js"></script>
+    <script src="../js/tv.js" defer></script>
+
+</body>
+
+</html>

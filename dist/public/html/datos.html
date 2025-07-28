@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Administrar ingresos</title>
+    <link rel="stylesheet" href="../css/datos.css" />
+    <link rel="icon" href="branding/Logo.png" type="image/x-icon" />
+
+    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
+    <div class="modal-overlay" id="modal-confirmacion">
+        <div class="modal">
+            <p id="modal-texto">¿Estás seguro de eliminar este ingreso?</p>
+            <div class="modal-buttons">
+                <button class="btn-confirmar" id="btn-confirmar">Sí</button>
+                <button class="btn-cancelar" id="btn-cancelar">No</button>
+            </div>
+        </div>
+    </div>
+
+</head>
+
+<body>
+
+    <div class="fila-vertical">
+
+        <div class="superior">
+            <div class="logo-container">
+                <img src="branding/Logo.png" alt="Logo" class="logo-img">
+            </div>
+        </div>
+
+        <div class="seccion seccion-titulo">
+            <h1>Administración de Ingresos</h1>
+        </div>
+
+        <div class="container-form">
+            <div class="seccion seccion-formulario">
+                <form id="form-dato">
+                    <div class="form-row">
+                        <input type="number" id="nuevo-dato" placeholder="Nuevo ingreso" required min="1" step="1"
+                            style="text-align: center;" />
+                        <button type="submit">Agregar</button>
+                    </div>
+                    <p id="mensaje-error" class="error-text"></p>
+                </form>
+            </div>
+        </div>
+
+        <div class="seccion seccion-lista">
+            <div class="contenedor-lista">
+                <ul id="lista-datos"></ul>
+            </div>
+        </div>
+
+
+        <script src="/js/socket.io.min.js"></script>
+        <script src="../js/datos.js" defer></script>
+
+</body>
+
+</html>

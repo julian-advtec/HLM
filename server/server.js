@@ -8,7 +8,6 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-
 const isPkg = typeof process.pkg !== 'undefined';
 const BASE_PATH = isPkg ? path.dirname(process.execPath) : __dirname;
 
@@ -61,6 +60,20 @@ app.use(express.json());
 app.use(express.static(PUBLIC_FOLDER));
 app.use('/media', express.static(MEDIA_FOLDER));
 app.use('/branding', express.static(BRANDING_FOLDER));
+
+// Rutas limpias para HTML (🆕 AGREGADO)
+app.get('/usuario', (req, res) => {
+    res.sendFile(path.join(PUBLIC_FOLDER, 'html', 'usuario.html'));
+});
+app.get('/admin', (req, res) => {
+    res.sendFile(path.join(PUBLIC_FOLDER, 'html', 'admin.html'));
+});
+app.get('/tv', (req, res) => {
+    res.sendFile(path.join(PUBLIC_FOLDER, 'html', 'tv.html'));
+});
+app.get('/datos', (req, res) => {
+    res.sendFile(path.join(PUBLIC_FOLDER, 'html', 'datos.html'));
+});
 
 // Endpoints
 app.get('/media-files', (req, res) => {
@@ -125,27 +138,85 @@ app.delete('/api/datos/:index', (req, res) => {
     res.json({ ok: true });
 });
 
+// Confirmar cambio de estado desde usuario.html o admin.html
+app.post('/api/historial', (req, res) => {
+    const { paciente, estado } = req.body;
+
+    if (!paciente || !estado) {
+        return res.status(400).json({ error: 'Faltan datos' });
+    }
+
+    try {
+        let historial = JSON.parse(fs.readFileSync(HISTORIAL_PATH, 'utf8'));
+
+        const orden = ['En preparación', 'En cirugía', 'En recuperación'];
+        const indexExistente = historial[0].lastIndexOf(paciente);
+        const estadoActual = indexExistente !== -1 ? historial[1][indexExistente] : null;
+
+        const idxActual = orden.indexOf(estadoActual);
+        const idxNuevo = orden.indexOf(estado);
+
+        const esValido = (estadoActual === null) || (Math.abs(idxNuevo - idxActual) === 1);
+
+        if (!esValido) {
+            return res.status(400).json({ error: 'Cambio de estado inválido' });
+        }
+
+        if (indexExistente !== -1) {
+            historial[0].splice(indexExistente, 1);
+            historial[1].splice(indexExistente, 1);
+        }
+
+        historial[0].push(paciente);
+        historial[1].push(estado);
+
+        fs.writeFileSync(HISTORIAL_PATH, JSON.stringify(historial, null, 2));
+        io.emit('update', historial);
+
+        res.json({ ok: true });
+    } catch (e) {
+        console.error('Error al actualizar historial:', e);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+app.get('/api/historial', (req, res) => {
+    try {
+        const historial = JSON.parse(fs.readFileSync(HISTORIAL_PATH, 'utf8'));
+        res.json(historial);
+    } catch (e) {
+        res.status(500).json({ error: 'No se pudo leer el historial' });
+    }
+});
+
 // WebSockets
 io.on('connection', (socket) => {
     console.log('🔌 Cliente conectado');
 
-    socket.emit('update', columnas);
+    // Leer historial en tiempo real (no usar variable columnas)
+    try {
+        const historial = JSON.parse(fs.readFileSync(HISTORIAL_PATH, 'utf8'));
+        socket.emit('update', historial);
+    } catch (e) {
+        console.error('Error al leer historial en conexión:', e);
+        socket.emit('update', [[], []]);
+    }
+
     socket.emit('actualizar-datos', leerDatos());
 
     socket.on('nuevo-dato', ({ textos }) => {
         if (!Array.isArray(textos) || textos.length !== 2) return;
 
-        columnas[0].unshift(textos[0]);
-        columnas[1].unshift(textos[1]);
+        let historial = JSON.parse(fs.readFileSync(HISTORIAL_PATH, 'utf8'));
 
-        columnas[0] = columnas[0].slice(0, 100);
-        columnas[1] = columnas[1].slice(0, 100);
+        historial[0].unshift(textos[0]);
+        historial[1].unshift(textos[1]);
 
-        fs.writeFile(HISTORIAL_PATH, JSON.stringify(columnas, null, 2), err => {
-            if (err) console.error('❌ Error guardando historial:', err);
-        });
+        historial[0] = historial[0].slice(0, 100);
+        historial[1] = historial[1].slice(0, 100);
 
-        io.emit('update', columnas);
+        fs.writeFileSync(HISTORIAL_PATH, JSON.stringify(historial, null, 2));
+        io.emit('update', historial);
     });
 
     socket.on('agregar-dato', (nuevoDato) => {
@@ -158,46 +229,72 @@ io.on('connection', (socket) => {
     socket.on('actualizar-estado', ({ nombre, nuevoEstado }) => {
         try {
             let historial = JSON.parse(fs.readFileSync(HISTORIAL_PATH, 'utf8'));
-            const indexExistente = historial[0].indexOf(nombre);
-            const estadoActual = indexExistente !== -1 ? historial[1][indexExistente] : null;
 
-            const orden = ['En preparación', 'En cirugía', 'En recuperación'];
-            const idxActual = orden.indexOf(estadoActual);
-            const idxNuevo = orden.indexOf(nuevoEstado);
-
-            const esValida = (estadoActual === null && idxNuevo === 0) || (idxNuevo === idxActual + 1);
-            if (!esValida) return;
-
-            if (indexExistente !== -1) {
-                historial[0].splice(indexExistente, 1);
-                historial[1].splice(indexExistente, 1);
+            const nuevasColumnas = [[], []];
+            for (let i = 0; i < historial[0].length; i++) {
+                if (historial[0][i] !== nombre) {
+                    nuevasColumnas[0].push(historial[0][i]);
+                    nuevasColumnas[1].push(historial[1][i]);
+                }
             }
 
-            historial[0].push(nombre);
-            historial[1].push(nuevoEstado);
+            nuevasColumnas[0].push(nombre);
+            nuevasColumnas[1].push(nuevoEstado);
 
-            fs.writeFileSync(HISTORIAL_PATH, JSON.stringify(historial, null, 2));
-            io.emit('update', historial);
+            fs.writeFileSync(HISTORIAL_PATH, JSON.stringify(nuevasColumnas, null, 2));
+            io.emit('update', nuevasColumnas);
         } catch (e) {
             console.error('Error al actualizar estado:', e);
         }
     });
 });
 
-// Iniciar servidor
-const START_PORT = 8080;
+app.post('/api/confirmar-estado', (req, res) => {
+    const { paciente, estado } = req.body;
 
-function iniciarServidor(puerto) {
-    server.listen(puerto, '0.0.0.0', () => {
-        console.log(`🟢 Servidor corriendo en http://localhost:${puerto}`);
-    }).on('error', (err) => {
-        if (err.code === 'EADDRINUSE') {
-            console.log(`⚠️ Puerto ${puerto} en uso. Probando siguiente...`);
-            iniciarServidor(puerto + 1);
-        } else {
-            console.error('Error iniciando servidor:', err);
+    if (!paciente || !estado) {
+        return res.status(400).json({ error: 'Faltan datos' });
+    }
+
+    try {
+        let historial = JSON.parse(fs.readFileSync(HISTORIAL_PATH, 'utf8'));
+
+        const nuevasColumnas = [[], []];
+        for (let i = 0; i < historial[0].length; i++) {
+            if (historial[0][i] !== paciente) {
+                nuevasColumnas[0].push(historial[0][i]);
+                nuevasColumnas[1].push(historial[1][i]);
+            }
         }
-    });
-}
 
-iniciarServidor(START_PORT);
+        nuevasColumnas[0].push(paciente);
+        nuevasColumnas[1].push(estado);
+
+        fs.writeFileSync(HISTORIAL_PATH, JSON.stringify(nuevasColumnas, null, 2));
+
+        io.emit('update', nuevasColumnas);
+        res.json({ ok: true });
+    } catch (e) {
+        console.error('Error al confirmar estado:', e);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
+
+// Login
+app.post('/api/login', (req, res) => {
+    const { usuario, clave } = req.body;
+    try {
+        const usuarios = JSON.parse(fs.readFileSync(path.join(SERVER_FOLDER, 'usuarios.json'), 'utf8'));
+        const existe = usuarios.some(u => u.usuario === usuario && u.clave === clave);
+        res.json({ ok: existe });
+    } catch (e) {
+        res.status(500).json({ ok: false, error: 'Error leyendo usuarios' });
+    }
+});
+
+// Iniciar servidor
+const PORT = 8081;
+
+server.listen(PORT, '0.0.0.0', () => {
+    console.log(`🟢 Servidor corriendo en http://localhost:${PORT}`);
+});

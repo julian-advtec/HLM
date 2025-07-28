@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Administrador</title>
+    <link rel="stylesheet" href="../css/admin.css" />
+      <link rel="icon" href="branding/Logo.png" type="image/x-icon" />
+</head>
+
+<body>
+    <!-- LOGIN -->
+    <div id="login-container">
+        <div class="login-box">
+            <h2>Iniciar sesión</h2>
+            <form onsubmit="login(); return false;">
+                <input type="text" id="usuario" placeholder="Usuario" autocomplete="username" />
+                <input type="password" id="clave" placeholder="Contraseña" autocomplete="current-password" />
+                <button class="button" type="submit">Entrar</button>
+                <p id="error-msg">Usuario y/o contraseña incorrectas</p>
+            </form>
+        </div>
+    </div>
+
+    <!-- INTERFAZ -->
+    <div id="admin-interface" style="display: none;">
+        <div class="superior">
+            <div class="logo-container">
+                <img src="branding/Logo.png" alt="Logo" class="logo-img" />
+            </div>
+        </div>
+
+        <div class="fila-vertical">
+            <div class="seccion seccion-titulo">
+                <h1>Gestión total de estados</h1>
+            </div>
+        </div>
+
+        <div class="container-form">
+            <div class="form-wrapper">
+                <input type="text" id="buscador-paciente" placeholder="Buscar paciente..." autocomplete="off" />
+            </div>
+        </div>
+
+        <div class="datos-container" id="datos-container">
+            <div class="titulos-fila">
+                <div class="titulo">Listado general de pacientes</div>
+            </div>
+        </div>
+
+        <!-- Modal personalizado -->
+        <div class="modal-overlay" id="modal-confirmacion">
+            <div class="modal">
+                <p id="modal-texto">¿Estás seguro de cambiar el estado?</p>
+                <div class="modal-buttons">
+                    <button class="btn-confirmar" id="btn-confirmar">Sí</button>
+                    <button class="btn-cancelar" id="btn-cancelar">No</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/socket.io.min.js"></script>
+     <script src="../js/admin.js" defer></script>
+
+</body>
+
+</html>
